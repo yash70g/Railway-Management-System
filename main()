@@ -1,0 +1,659 @@
+//Railway Management System (C CODE)
+
+//Importing the required libraries 
+#include<stdio.h>
+#include<math.h>
+#include<string.h>
+/************GLOBAL VARIABLES**************/
+//ALl the globle variables and the composite data types will be declared here
+    int tickets[11]={0,23,45,12,33,42,0,10,7,1,0};
+    int Transaction_ID=116596; //storing a random address for reservation indexes
+    int menu=0;
+    int total=0;
+/************FUNCTION PROTOTYPE*************/
+
+//function prototypes to be used
+void viewdetails(void);                         //view details of all the trains
+void printticket(int ,int );    //print ticket 
+void specifictrain(int);                        //print data related to specific train
+int charge(int,int);                            //charge automatically w.r.t number of seats and train
+int ticket(int, int);
+int facility(int);
+void Bills();
+
+/***********FUNCTION DECLARATION***************/
+
+/**************MAIN()****************/
+
+int main()
+{   
+    restart :
+    int choice;
+    printf("\t\t=================================================\n");
+    printf("\t\t|                                               |\n");
+    printf("\t\t|        -----------------------------          |\n");
+    printf("\t\t|           TRAIN TICKET RERS. SYSTEM           |\n");
+    printf("\t\t|        -----------------------------          |\n");
+    printf("\t\t|                                               |\n");
+    printf("\t\t|                                               |\n");
+    printf("\t\t|                                               |\n");
+    printf("\t\t|              BROUGHT TO YOU BY                |\n");
+    printf("\t\t|                   |YASH|                      |\n");
+    printf("\t\t|                                               |\n");
+    printf("\t\t=================================================\n");
+        
+    int choice_return,id,seats;
+
+    printf("=================================\n");
+    printf("    TRAIN RESERVATION SYSTEM");
+    printf("\n------------------------");
+    printf("\n1>> View All Available Trains");
+    printf("\n------------------------");
+    printf("\n2>> Print Ticket");
+    printf("\n------------------------");
+    printf("\n3>> Add other Fascilites ");
+    printf("\n------------------------");
+    printf("\n4>> Check for seats in specific train ");
+    printf("\n------------------------");
+    printf("\n5>>Pay Total Dues ");
+    printf("\n------------------------");
+    printf("\n0>> Exit");
+    printf("\n------------------------");
+    printf("\n\n-->");
+    scanf("%d",&menu);
+
+    switch(menu)
+    {
+        case 1:
+            viewdetails();
+            printf("\n\nPress any [Number] to continue reservation/pay bills or repeatedly enter '0' to exit the portal\n\n");
+            scanf("%d",&menu);
+            if (menu==0)
+                printf("Thankyou for using our services\n");
+                else
+            goto restart;
+            break;
+
+        case 2:
+            printf("Enter Train ID\n");
+            correct:
+            scanf("%d",&id);
+            if(id>10)
+            {
+                printf("Enter Correct ID\n");
+                goto correct;
+            }
+            else
+            printf("Enter Number of Seats\n");
+            scanf("%d",&seats);
+            if(seats==0)
+            {
+                printf("Seats cannot be less then zero\n");
+                main();
+            }
+            ticket(id,seats);
+            break;
+
+         case 3:
+            printf("\nList of Facilites with their prices\n") ;
+            printf("-------------------------------------------------------------------------------------------------------");  
+            printf("\nS.No\tName\t\tProvider\tCharges\n");
+            printf("1\tCoolie \t\t3rd Party\t100/bag\n");
+            printf("2\tTaxi   \t\t3rd Party\t47/Kilometer\n");
+            printf("3\tBlanket\t\tDepart Station\t100/seat\n");
+            printf("\n\n-------------------------------------------MEALS--------------------------------------------------\n\n");   
+            printf("\nS.No\tName\t\t\tType\t\tCharges\n");
+            printf("4\tSandwich\t\tBreakfast\t100/person\n");
+            printf("5\tCold/Hot Milk\t\tCommon\t\t50/person\n");
+            printf("6\tPoorie & Pickle\t\tBreakfast\t100/person\n");
+            printf("7\tFruit Juice\t\tCommon\t\t30\n");
+            printf("8\tVeg Thali\t\tLunch+Dinner\t300/person\n");
+            printf("9\tNon Veg Thali\t\tLunch+Dinner\t400/person\n");
+            printf("10\tChinese Platter\t\tDinner\t\t400/person\n");
+            printf("11\tSouth Indian Platter\tDinner\t\t350/person\n");
+            resume:
+            printf("\nPress 1 to other facilites, 2 to add meals - ");
+            scanf("%d",&choice);
+            if(choice==1 || choice==2)
+            {
+                facility(choice);
+                printf("\n\nPress any [Number] to continue availaing services/pay bills or '0' to exit the portal\n\n");
+                scanf("%d",&choice);
+                if (choice==0)
+                    {
+                        printf("Thankyou for using our services\n");
+                        break;
+                    }
+                else 
+                    {
+                        goto resume;
+                    }
+            }
+            else
+            {
+                printf("Service not avaiable, Try Again\n");
+                goto resume;
+            }
+        
+        case 4:
+            printf("Enter Train ID\n");
+            scanf("%d",&id);
+            if(id>10)
+            printf("Enter Correct ID\n");
+            else
+            specifictrain(id);
+            printf("\n\nPress any [Number] to continue reservation/pay bills or repeatedly enter '0' to exit the portal\n\n");
+            scanf("%d",&choice);
+            if (choice==0)
+            {
+                printf("Thankyou for using our services\n");
+                break;
+            }
+            main();
+
+        case 5:
+            Bills();
+            printf("\n\nPress any [Number] to continue reservation/pay bills or repeatedly enter '0' to exit the portal\n\n");
+            scanf("%d",&choice);
+            if (choice==0)
+            {
+                printf("Thankyou for using our services\n");
+                return 0;
+            }
+            main();
+
+        case 0:
+            printf("\n\nThankyou for using our services\n");
+            break;
+
+        default:
+            printf("Enter correct choice!\n");
+            main();
+    }
+        return 0;
+}
+
+        void viewdetails(void)
+    {   int x=0;
+        printf("-------------------------------------------------------------------------------------------------------");  
+        printf("\nTr.No\tName\t\t\tDestinations\t\tCharges\t\tTime\t\tTickets Left\n");
+        printf("-------------------------------------------------------------------------------------------------------");
+        printf("\n1\tRajdhani Express\tDelhi to Bhopal\t\tRs.5000\t\t9am\t\t%d",tickets[++x]);
+        printf("\n2\tShatabdi Express\tJaipur to Kolkata\tRs.5000\t\t12pm\t\t%d",tickets[++x]);
+        printf("\n3\tTaj Express\t\tDelhi to Gwalior\tRs.4500\t\t8am\t\t%d",tickets[++x]);
+        printf("\n4\tVivek Express\t\tDibrugarh to Kerela\tRs.8500\t\t11am\t\t%d",tickets[++x]);
+        printf("\n5\tVande Bharat\t\tDelhi to Jammu\t\tRs.4000\t\t7am\t\t%d",tickets[++x]);
+        printf("\n6\tNizamuddin Express      Pune to New Delhi\tRs.4000\t\t9.30am\t\t%d",tickets[++x]);
+        printf("\n7\tMandovi Express\t\tMadgaon to Mumbai\tRs.3500\t\t1pm\t\t%d",tickets[++x]); 
+        printf("\n8\tJammu Mail\t\tJammu to Udhampur\tRs.3500\t\t4pm\t\t%d",tickets[++x]);
+        printf("\n9\tPunjab Mail\t\tAmritsar to Bhopal\tRs.6000\t\t3.35pm\t\t%d",tickets[++x]);
+        printf("\n10\tGolden Chariot\t\tBangalore to Goa\tRs.16000\t4.15pm\t\t%d",tickets[++x]);
+    }
+
+        void specifictrain(int id)
+    {
+        
+        if (id==1)
+        {
+            printf("\nTrain:\t\t\tRajdhani Express");
+            printf("\nDestination:\t\tDelhi to Bhopal");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nTrain ID:\t\t\%d",id);
+            printf("\nDeparture:\t\t9am");
+        }
+
+        if (id==2)
+        {
+            printf("\nTrain:\t\t\tShatabdi Express");
+            printf("\nDestination:\t\tJaipur to Kolkata");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nTrain ID:\t\t\%d",id);
+            printf("\nDeparture:\t\t12pm");
+        }
+
+        if (id==3)
+        {
+            printf("\nTrain:\t\t\tTaj Express");
+            printf("\nDestination:\t\tDelhi to Gwalior");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nTrain ID:\t\t\%d",id);
+            printf("\nDeparture:\t\t8am");
+        }
+
+        if (id==4)
+        {
+            printf("\nTrain:\t\t\tVivek Express");
+            printf("\nDestination:\t\tDibrugarh to Kanyakumari");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nTrain ID:\t\t%d",id);
+            printf("\nDeparture:\t\t11am ");
+        }
+
+        if (id==5)
+        {
+            printf("\nTrain:\t\t\tVande Bharat");
+            printf("\nDestination:\t\tDelhi to Jammu");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nTrain ID:\t\t%d",id);
+            printf("\nDeparture:\t\t7am");
+        }
+
+        if (id==6)
+        {
+            printf("\ntrain:\t\t\tNizamuddin Duronto Express");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nDestination:\t\tPune to New Delhi");
+            printf("\nTrain ID:\t\t%d",id);
+            printf("\nDeparture:\t\t9.30am ");
+        }
+
+        if (id==7)
+        {
+            printf("\ntrain:\t\t\tMandovi Express");
+            printf("\nDestination:\t\tMadgaon to Mumbai");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nTrain ID:\t\t%d",id);
+            printf("\nDeparture:\t\t1pm ");
+        }
+
+        if (id==8)
+        {
+            printf("\ntrain:\t\t\tJammu Mail");
+            printf("\n Destination:\t\tJammu to Udhampur");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nTrain ID:\t\t%d",id);
+            printf("\nDeparture:\t\t4pm ");
+        }
+
+        if (id==9)
+        {
+            printf("\ntrain:\t\t\tPunjab Mail");
+            printf("\nDestination:\t\tAmritsar to Bhopal");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nTrain ID:\t\t%d",id);
+            printf("\nDeparture:\t\t3.35pm ");
+        }
+
+        if (id==10)
+        {
+            printf("\ntrain:\t\t\tGolden Chariot");
+            printf("\nDestination:\t\tBangalore (Karnataka) to Goa");
+            printf("\nTickets available \t%d",tickets[id]);
+            printf("\nTrain ID:\t\t%d",id);
+            printf("\nDeparture:\t\t1.15 ");
+        }
+    }
+
+
+    int ticket(int id,int seats)
+    {
+        if(tickets[id]>=seats)
+        {
+            tickets[id]=tickets[id]-seats;
+            printf("Reservation successful here are your Ticket(s)\n\n");
+            printticket(id,seats);
+        }
+        else 
+        {
+            printf("Not enough seats in this train, please select another train,date\n");
+            main();         
+        }
+        return 0;
+    }
+
+    void printticket(int id,int seats)
+{   
+    printf("-------------------\n");
+    printf("\tTICKET\n");
+    printf("-------------------\n\n");
+    printf("Reservation Number:\t%d",Transaction_ID++);
+    printf("\nNumber Of Seats:\t%d",seats);
+    specifictrain(id);
+    printf("\nCharges:\t\t");
+    if (id==1)
+        {
+            printf("%d\n",(5000*seats));
+            total = total + 5000*seats;
+        }
+        if (id==2)
+        {
+            printf("%d\n",(5000*seats));
+        total = total + 5000*seats;
+
+        }
+        if (id==3)
+        {
+            printf("%d\n",(4500*seats));
+        total = total + 4500*seats;
+
+        }
+        if (id==4)
+        {
+            printf("%d\n",(8500*seats));
+        total = total + 8500*seats;
+
+        }
+        if (id==5)
+        {
+            printf("%d\n",(4000*seats));
+        total = total + 4000*seats;
+
+        }
+        if (id==6)
+        {
+            printf("%d\n",(4000*seats));
+        total = total + 4000*seats;
+
+        }
+        if (id==7)
+        {
+            printf("%d\n",(3500*seats));
+        total = total + 3500*seats;
+
+        }
+        if (id==8)
+        {
+            printf("%d\n",(3500*seats));
+        total = total + 3500*seats;
+
+        }
+        if (id==9)
+        {
+            printf("%d\n",(6000*seats));
+        total = total + 6000*seats;
+
+        }
+        if (id==10)
+        {
+            printf("%d\n",(16000*seats));
+            total = total + 16000*seats;
+        }
+    printf("\nPress any [NUMBER] to continue reservation/pay bills or repeatedly enter '0' to exit the portal\n");
+    scanf("%d",&menu);
+    if(menu!=0)
+    {
+        main();
+    }
+    else
+    {
+        printf("Thankyou for using our services\n");
+    }
+}
+int facility(int type)
+{
+    int price,c=0;
+    if(type==1)
+    {
+        printf("Enter the Service S.No you need\n");
+        ("-------------------------------------------------------------------------------------------------------");    
+            printf("\nS.No\tName\t\tProvider\tCharges\n");
+            printf("1\tCoolie \t\t3rd Party\t100/bag\n");
+            printf("2\tTaxi   \t\t3rd Party\t47/Kilometer\n");
+            printf("3\tBlanket\t\tDepart Station\t100/seat\n");
+            printf("Selected Choice - ");
+        scanf("%d",&c);
+        switch (c)
+        {
+        case 1:
+            printf("\nEnter Number of Bags\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*100);
+            printf("Transaction ID- %d",Transaction_ID++);
+            total=total+100*c;
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        case 2:
+            printf("Enter Distance in Kilomeeters\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*47);
+            total=total+47*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                printf("Thankyou for using our services\n");
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        case 3:
+            printf("Enter number of seats\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*100);
+            total=total+100*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                printf("Thankyou for using our services\n");
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        default:
+            printf("Enter Correct Choice\n");
+            facility(1);
+            break;
+        }
+    }
+    if(type==2)
+    {
+        printf("Enter the Meal's S.No you need\n");
+        printf("\n\n-------------------------------------------MEALS--------------------------------------------------\n\n");   
+            printf("\nS.No\tName\t\t\tType\t\tCharges\n");
+            printf("4\tSandwich\t\tBreakfast\t100/person\n");
+            printf("5\tCold/Hot Milk\t\tCommon\t\t50/person\n");
+            printf("6\tPoorie & Pickle\t\tBreakfast\t100/person\n");
+            printf("7\tFruit Juice\t\tCommon\t\t30\n");
+            printf("8\tVeg Thali\t\tLunch+Dinner\t300/person\n");
+            printf("9\tNon Veg Thali\t\tLunch+Dinner\t400/person\n");
+            printf("10\tChinese Platter\t\tDinner\t\t400/person\n");
+            printf("11\tSouth Indian Platter\tDinner\t\t350/person\n");
+            printf("Number - ");
+            scanf("%d",&c);
+        switch (c)
+        {
+        case 4:
+            printf("Enter Number of Plates\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*100);
+            total=total+100*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                printf("Thankyou for using our services\n");
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        case 5:
+            printf("Enter Number of Plates\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*50);
+            total=total+50*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        case 6:
+            printf("Enter Number of Plates\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*100);
+            total=total+100*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        case 7:
+            printf("Enter Number of Plates\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*30);
+            total=total+30*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        case 8:
+            printf("Enter Number of Plates\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*300);
+            total=total+300*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        case 9:
+            printf("Enter Number of Plates\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*400);
+            total=total+400*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        case 10:
+            printf("Enter Number of Plates\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*400);
+            total=total+400*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        case 11:
+            printf("Enter Number of Plates\n");
+            scanf("%d",&c);
+            printf("Extra Amount to pay via portal - %d\n",c*350);
+            total=total+350*c;
+            printf("Transaction ID- %d",Transaction_ID++);
+            printf("\nPress any [NUMBER] to return to main menu/Pay Bills or repeatedly enter '0' to exit the portal\n");
+            scanf("%d",&menu);
+            if(menu!=0)
+            {
+                main();
+            }
+            else
+            {
+                printf("Thankyou for using our services\n");
+            }
+            break;
+        }
+    }
+    return 0;
+}
+void Bills()
+{
+    int method,No,pin;
+    char name[40];
+    printf("\n Total Dues for all the Transactions (Including Tickets and Extra Services) - %d",total);
+    printf("\nPay your dues for all the transactions \n\n");
+    printf("Payment Mode :\n");
+    printf("1) Debit Card\n2) Net Banking\n3) UPI \n");
+    scanf("%d",&method);
+    switch (method)
+    {
+    case 1:
+        printf("Enter Card Details\nNo.- ");
+        scanf("%d",&No);
+        printf("\nName on Card- ");
+        scanf("%s",name);
+        printf("\nPIN- ");
+        scanf("%d",&pin);
+        break;
+    case 2:
+        printf("Enter Bank Details\nAccount No.- ");
+        scanf("%d",&No);
+        printf("\nName of holder- ");
+        scanf("%s",name);
+        printf("\nPassword- ");
+        scanf("%d",&pin);
+        break;
+    case 3:
+        printf("Enter UPI id- ");
+        scanf("%s",name);
+        printf("\nPin- ");
+        scanf("%d",&pin);
+        break;
+        
+    default:
+    printf("\nEnter Correct Mode of Payment\n");
+        Bills();
+        break;
+    }
+
+    printf("\n\n====================TRANSACTION_RECIPT======================\n\n");
+        printf("\n\nAmount Paid -\t%d\n",total);
+        printf("Paid By - %s\n",name);
+        printf("\n==========================================");
+}
